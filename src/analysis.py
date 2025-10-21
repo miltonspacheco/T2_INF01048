@@ -20,8 +20,8 @@
 # value iteration.
 
 def question2():
-    answerDiscount = 0.9
-    answerNoise = 0
+    answerDiscount = 0.99
+    answerNoise = 0.02
     return answerDiscount, answerNoise
 
 if __name__ == '__main__':
