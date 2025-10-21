@@ -50,6 +50,7 @@ class QLearningAgent(ReinforcementAgent):
           Should return 0.0 if we have never seen a state
           or the Q node value otherwise
         """
+        # Retornará zero se não tiver mapeado o estado pois é do tiop util.Counter()
         return self.qValues[(state, action)]
 
 
@@ -111,7 +112,13 @@ class QLearningAgent(ReinforcementAgent):
         action = None
         if not legalActions:
             return None
-        action = self.computeActionFromQValues(state)
+        if util.flipCoin(self.epsilon):
+            # Com <epsilon>% de chance, 
+            # Escolhe (dentro de TODAS as ações legais), uma ação aleatória
+            action = random.choice(legalActions)
+        else:
+            # Com <epsilon-1>% de chance, computa a melhor ação
+            action = self.computeActionFromQValues(state)
 
         return action
 
@@ -126,8 +133,9 @@ class QLearningAgent(ReinforcementAgent):
         """
         current_q_value = self.getQValue(state, action)
         max_next_q_value = self.computeValueFromQValues(nextState)
-        # Atualiza valor Q usando a fórmula Q(s,a) = Q(s,a) + α[r + γ*max_a'Q(s',a') - Q(s,a)]
-        new_q_value = current_q_value + self.alpha * (reward + self.discount * max_next_q_value - current_q_value)
+
+        # Atualiza valor Q usando a fórmula Q(s,a)_k+1 = (1-α)* Q(s,a) + α[r(s,a) + γ*max_a'Q(s',a')]
+        new_q_value = (1-self.alpha) * current_q_value + self.alpha * (reward + self.discount * max_next_q_value)
         self.qValues[(state, action)] = new_q_value
 
     def getPolicy(self, state):
